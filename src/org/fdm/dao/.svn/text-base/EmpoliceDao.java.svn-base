@@ -1,0 +1,68 @@
+package org.hicode.mutualhelp.server.dao;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.hicode.mutualhelp.common.domain.*;
+
+public class EmpoliceDao {
+	
+	public static int addEmpolice(Empolice emp){
+		int id = findMaxId() + 1;
+		String sql = "insert into empolice (id,user_id,help_address_lon,help_address_lat,help_time,is_help_round,is_help_relation,is_open) values("+id+","+emp.getUser().getUser_id()+","+emp.getLocation().getLon()+","+emp.getLocation().getLat()+",'"+emp.getHelp_time()+"',"+emp.getIs_help_round()+","+emp.getIs_help_relation()+","+emp.getIs_open()+")";
+System.out.println(sql);
+		Dao.insert(sql);	
+		return id;
+	}
+	
+	
+	public static int findMaxId(){
+		String sql = "select max(id) as id from empolice";
+    	
+    	List<Map<String, Object>> list = Dao.select(sql);
+    	if (list == null || list.size() == 0){
+    		return 0;
+    	}
+    	if (list.get(0).get("id") == null)
+    		return 0;
+    	return Integer.parseInt(list.get(0).get("id").toString());
+	}
+	
+	public static int findUserIdbyEmId(int id){
+		String sql = "select user_id from empolice where id = " +id;
+		
+		List<Map<String, Object>> list = Dao.select(sql);
+    	if (list == null || list.size() == 0){
+    		return 1;
+    	}
+    	Map<String, Object> map = list.get(0);
+    	int i = Integer.parseInt(map.get("user_id").toString());
+    	return i;
+	}
+	
+	public static List<Empolice> findOpenEmpolice(){
+		String sql = "select * from empolice where is_open = 1";
+    	List<Empolice> empList = new java.util.ArrayList<Empolice>();
+    	
+    	List<Map<String, Object>> list = Dao.select(sql);
+    	if (list == null || list.size() == 0){
+    		return null;
+    	}
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	for (int i=0;i<list.size();i++){
+    		map = list.get(i);
+    		Empolice emp = new Empolice();
+    		emp.setId(Integer.parseInt(map.get("id").toString()));
+    		emp.setUser(new User(Integer.parseInt(map.get("user_id").toString())));
+    		double lon = Double.parseDouble(map.get("help_address_lon").toString());
+    		double lat = Double.parseDouble(map.get("help_address_lat").toString());
+    		emp.setLocation(new Location(lon, lat));
+    		emp.setHelp_time(map.get("help_time").toString());
+    		emp.setIs_help_relation(Integer.parseInt(map.get("is_help_relation").toString()));
+    		emp.setIs_help_round(Integer.parseInt(map.get("is_help_round").toString()));
+    		empList.add(emp);
+    	}
+		return empList;
+	}
+}

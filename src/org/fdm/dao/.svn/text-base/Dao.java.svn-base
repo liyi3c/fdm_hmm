@@ -1,0 +1,106 @@
+package org.hicode.mutualhelp.server.dao;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.hicode.mutualhelp.server.database.DBConnectionPool;
+
+
+import com.mysql.jdbc.ResultSetMetaData;
+
+public class Dao {
+	private static DBConnectionPool connPool = DBConnectionPool.getInstance();
+    private static Connection conn;
+
+	public static int insert(String sql)
+	{
+		try {
+			conn = connPool.getConn();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		int i = 0;
+		Statement stmt = null;
+		try {
+			stmt = (Statement) conn.createStatement();
+			i = stmt.executeUpdate(sql);
+			stmt.close();
+			if (conn != null){
+				conn.close();
+			}		
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return i;
+	}
+	public static int delete(String sql)
+	{
+		int i = insert(sql);
+		return i;
+	}
+	public static List<Map<String, Object>> select(String sql)
+	{
+		try {
+			conn = connPool.getConn();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		Statement stmt = null;
+		ResultSet rs = null;
+		try
+		{
+			stmt = (Statement) conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			ResultSetMetaData metaData = (ResultSetMetaData) rs.getMetaData();
+			int columnCount = metaData.getColumnCount();
+			while (rs.next()){
+				Map<String, Object> map = new HashMap<String, Object>();
+				for (int i = 1;i <= columnCount; i++){
+					String columnLabel = metaData.getColumnLabel(i);
+					map.put(columnLabel, rs.getObject(columnLabel));
+				}
+			list.add(map);
+		}
+		} catch (SQLException e){
+			e.printStackTrace();
+		} finally{
+			if (rs != null) {
+				try {
+					rs.close();
+					rs = null;
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (stmt != null) {
+				try {
+					stmt.close();
+					stmt = null;
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (conn != null){
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return list;
+	}
+	public static int update(String sql)
+	{
+		int i = insert(sql);
+		return i;
+	}
+
+}
