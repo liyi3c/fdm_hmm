@@ -1,0 +1,74 @@
+<project name="FdmHmm" default="jar" basedir="." >
+
+  <property name="build.home"    value="${basedir}/classes"/>
+  <property name="build.tests"    value="${basedir}/classes"/>
+  <property name="docs.home"     value="${basedir}/docs"/>
+  <property name="src.home"      value="${basedir}/src"/>
+  <property name="javadoc.home"  value="${basedir}/javadoc"/>
+  <property name="jar.dir"     value="${basedir}/deploy"/>
+	
+  <property name="compile.debug"       value="true"/>
+  <property name="compile.deprecation" value="false"/>
+  <property name="compile.optimize"    value="true"/>
+  <property name="compile.source"      value="1.7" />
+  <property name="compile.target"      value="1.7" />
+	
+	  <target name="classpath" description="Sets the classpath">
+	      <path id="compile.classpath">
+	      	<fileset dir="${basedir}/lib">
+	          <include name="*.jar"/>
+	          <exclude name="javanlp*"/>
+	        </fileset>
+	      </path>
+		<pathconvert property="manifest.classpath" pathsep=" ">
+		  <path refid="compile.classpath"/>
+		  <mapper>
+		    <chainedmapper>
+		       <flattenmapper/>
+		       <globmapper from="*.jar" to="lib/*.jar"/>
+		    </chainedmapper>
+		  </mapper>
+		</pathconvert>
+	  </target>
+	
+	  <target name="prepare">
+	    <!-- Create build directories as needed -->
+	    <mkdir  dir="${build.home}"/>
+	  </target>
+	
+	  <target name="compile" depends="prepare,classpath"
+	   description="Compile Java sources">
+	    <!-- Compile Java classes as necessary -->
+	    <mkdir    dir="${build.home}"/>
+	    <javac srcdir="${src.home}"
+	          destdir="${build.home}"
+	            debug="${compile.debug}"
+	         encoding="utf-8" 
+	      deprecation="${compile.deprecation}"
+	         optimize="${compile.optimize}"
+		   source="${compile.source}"
+	           target="${compile.target}"
+	    	includeantruntime="off">
+	        <classpath refid="compile.classpath"/>
+	      <compilerarg value="-Xmaxerrs"/>
+	      <compilerarg value="20"/>
+	      <!-- <compilerarg value="-Xlint"/> -->
+	    </javac>
+	  	</target>
+	
+		<target name="deployconf">
+			<copy file="${src.home}/beans.xml" todir="${build.home}"/>
+			<copy file="${src.home}/jdbc.properties" todir="${build.home}"/>
+			<copy file="${src.home}/log4j.properties" todir="${build.home}"/>
+		</target>
+	
+		<target name="jar" depends="compile, deployconf">
+	        <mkdir dir="${jar.dir}"/>
+	        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${build.home}">
+	        	<manifest>
+		            <attribute name="Main-Class" value="org.fdm.run.HmmMain"/>
+		            <attribute name="Class-Path" value="${manifest.classpath}"/>
+		        </manifest>
+	        </jar>
+	    </target>
+	</project>

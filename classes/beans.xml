@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+	<context:annotation-config />
+	<context:component-scan base-package="org.fdm" />
+	
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<value>classpath:jdbc.properties</value>
+		</property>
+	</bean>
+
+	<bean id="dataSource" destroy-method="close"
+		class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName"
+			value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+
+
+	</bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="annotatedClasses">
+			<list>
+			<value>org.fdm.domain.Work</value>
+			<value>org.fdm.domain.WorkDetail</value>
+			<value>org.fdm.domain.WorkRelation</value>
+			<value>org.fdm.domain.Redirect</value>
+			<value>org.fdm.domain.ComBasic</value>
+			<value>org.fdm.domain.ComName</value>
+			<value>org.fdm.domain.TestComb</value>
+			<value>org.fdm.domain.ExperD</value>
+			<value>org.fdm.domain.Exper</value>
+			<value>org.fdm.domain.PersonInfor</value>
+			<value>org.fdm.domain.Intro_learn</value>
+			<value>org.fdm.domain.All_pos</value>
+			<value>org.fdm.domain.All_com</value>
+			<value>org.fdm.domain.AllDictTokens</value>
+			<value>org.fdm.domain.Intro_seg</value>
+			<value>org.fdm.domain.Intro_test</value>
+			<value>org.fdm.domain.RelationComHama</value>
+			<value>org.fdm.domain.TrainData</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQLDialect
+				</prop>
+				
+			</props>
+			
+		</property>
+	</bean>
+  
+
+</beans>

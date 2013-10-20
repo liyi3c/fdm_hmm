@@ -4,6 +4,8 @@
 package org.fdm.util;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author liyi
@@ -16,8 +18,6 @@ public class StrHandler {
 		int s2len;
 		int d1,d2,d3;
 
-
-		
 		s1len = s1.length();
 		s2len = s2.length();
 		
@@ -91,7 +91,7 @@ public class StrHandler {
 			return 0;
 	}
 	
-	static public int getFirstEnIndex(String s){
+	public static int getFirstEnIndex(String s){
 		int n;
 		
 		for(int i=0;i<s.length();i++){
@@ -103,7 +103,7 @@ public class StrHandler {
 		return -1;
 	}
 	
-	static public int getLastEnIndex(String s){
+	public static int getLastEnIndex(String s){
 		int n;
 		int stat = 0;
 		for(int i=0;i<s.length();i++){
@@ -120,6 +120,35 @@ public class StrHandler {
 		return -1;
 	}
 	
+	public static int getFirstCnIndex(String s){
+		int n;
+		
+		for(int i=0;i<s.length();i++){
+			n = (int)s.charAt(i);
+			if(19968<=n&&n<=40623){
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	public static int getLastCnIndex(String s){
+		int n;
+		int stat = 0;
+		for(int i=0;i<s.length();i++){
+			n = (int)s.charAt(i);
+			if(19968<=n&&n<=40623){
+				stat = 1;
+				if(i==s.length()-1)
+					return i;
+			}
+			else if(stat==1&&!(19968<=n&&n<=40623)){
+				return i-1;
+			}
+		}
+		return -1;
+	}
+	
 	public static String intro_array2string(ArrayList<String> text,  ArrayList<Integer> cls){
 		String intro_replace = new String();
 		for(int i=0;i<text.size();i++){
@@ -130,24 +159,12 @@ public class StrHandler {
 	}
 	
 	public static void intro_string2array(String introduction, ArrayList<String> text,  ArrayList<Integer> cls){
-		int count_tab=0;
-		int point=0;
-		for(int j=0;j<introduction.length();j++){
-			if(introduction.charAt(j)=='\t'){
-				//System.out.println("count_tab%3 "+count_tab%3);
-				if(count_tab%3==0){
-					//System.out.println("text");
-					text.add(introduction.substring(point, j));
-						
-				}else if(count_tab%3==1){
-					//System.out.println("cls");
-					cls.add(Integer.parseInt(introduction.substring(point, j)));
-					
-				}
-				count_tab++;
-				point=j+1;
-				
-			}
+		Pattern pattern = Pattern.compile("(?<tok>[^\\s]+)[\\s+]+(?<type>\\d+)[\\s+]+(?<index>\\d+)[\\s+]+");
+		Matcher matcher;
+		matcher = pattern.matcher(introduction);
+		while(matcher.find()) {
+			text.add(matcher.group("tok"));
+			cls.add(Integer.parseInt(matcher.group("type")));
 		}
 	}
 	

@@ -26,8 +26,6 @@
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
-
-
 	</bean>
 
 	<bean id="sessionFactory"
@@ -48,10 +46,11 @@
 			<value>org.fdm.domain.Intro_learn</value>
 			<value>org.fdm.domain.All_pos</value>
 			<value>org.fdm.domain.All_com</value>
-			<value>org.fdm.domain.Com_tokens</value>
+			<value>org.fdm.domain.AllDictTokens</value>
 			<value>org.fdm.domain.Intro_seg</value>
 			<value>org.fdm.domain.Intro_test</value>
 			<value>org.fdm.domain.RelationComHama</value>
+			<value>org.fdm.domain.TrainData</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
