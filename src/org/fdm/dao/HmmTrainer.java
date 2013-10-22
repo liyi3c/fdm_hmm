@@ -62,6 +62,7 @@ public class HmmTrainer {
 	public void genHmmModel() {
 		genTextMaps();	
 		genProbMats();
+		
 		HmmModel hmm = new HmmModel(cls_cls_prob, cls_text_prob, clsMap_cls, distc_text);
 		FileOutputStream fos = null;
 		ObjectOutputStream oos = null;

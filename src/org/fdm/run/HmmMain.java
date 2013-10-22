@@ -9,12 +9,16 @@ import javax.annotation.Resource;
 
 import org.fdm.dao.HmmComputer;
 import org.fdm.dao.HmmTrainer;
+import org.fdm.dao.HmmTrainerData;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
 public class HmmMain {
+	private final static boolean DEBUG = true;
 	private HmmTrainer hmmTrainer;
+	private HmmComputer hmmComputer;
+	private HmmTrainerData hmmData;
 	
 	public HmmTrainer getHmmTrainer(){
 		return hmmTrainer;
@@ -25,8 +29,6 @@ public class HmmMain {
 		this.hmmTrainer = hmmTrainer;
 	}
 	
-	private HmmComputer hmmComputer;
-	
 	public HmmComputer getHmmComputer(){
 		return hmmComputer;
 	}
@@ -36,16 +38,32 @@ public class HmmMain {
 		this.hmmComputer = hmmComputer;
 	}
 
+	public HmmTrainerData getHmmData() {
+		return hmmData;
+	}
+
+	@Resource
+	public void setHmmData(HmmTrainerData hmmData) {
+		this.hmmData = hmmData;
+	}
+
 	public static void main(String[] args) throws IOException {
 		long startTime=System.currentTimeMillis();   //获取开始时间  
 		HmmComputer hmmCpt;
 		HmmTrainer hmmTrn;
+		HmmTrainerData hmmData;
 		Properties config;
 		FileInputStream conFis = null;
 		String mode;
 		
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
 		HmmMain hmm = (HmmMain)ctx.getBean("hmmMain");
+		if (DEBUG) {
+			hmmData = hmm.getHmmData();
+			//hmmData.getPriorToken(999, "Position");
+			hmmData.addPriorTokenTag(888);
+		}
+		else {
 		if (args.length < 1 || args.length > 2)
 			System.out.println("Usage: java -jar FdmHmm.jar xxx.properties [testFile]");
 		else if (args.length == 1) {
@@ -85,7 +103,7 @@ public class HmmMain {
 				System.out.println("Invalid Mode!!!");
 			}
 		}
-		
+		}
 		long endTime=System.currentTimeMillis(); //获取结束时间  
 		System.out.println("程序运行时间： "+(endTime-startTime)+"ms"); 
 	}
