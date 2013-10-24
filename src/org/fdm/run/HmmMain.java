@@ -59,9 +59,16 @@ public class HmmMain {
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
 		HmmMain hmm = (HmmMain)ctx.getBean("hmmMain");
 		if (DEBUG) {
-			hmmData = hmm.getHmmData();
-			//hmmData.getPriorToken(999, "Position");
-			hmmData.addPriorTokenTag(888);
+//			hmmData = hmm.getHmmData();
+//			//hmmData.getPriorToken(999, "Position");
+//			hmmData.addPriorTokenTag(888);
+//			hmmTrn = hmm.getHmmTrainer();
+//			hmmTrn.setModelName("1.s");
+//			hmmTrn.genHmmModel();
+			
+			hmmCpt = hmm.getHmmComputer();
+			hmmCpt.setHmmModelFile("1.s");
+			hmmCpt.compute();
 		}
 		else {
 		if (args.length < 1 || args.length > 2)
