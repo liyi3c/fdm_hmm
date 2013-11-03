@@ -26,6 +26,7 @@ public class PersonInfor {
 	String begin_year;
 	String end_year;
 	String introduction;
+	String introductionSeg;
 	String note;
 	int if_pay;
 	int total;
@@ -109,6 +110,12 @@ public class PersonInfor {
 	}
 	public void setIntroduction(String introduction) {
 		this.introduction = introduction;
+	}
+	public String getIntroductionSeg() {
+		return introductionSeg;
+	}
+	public void setIntroductionSeg(String introductionSeg) {
+		this.introductionSeg = introductionSeg;
 	}
 	public String getNote() {
 		return note;

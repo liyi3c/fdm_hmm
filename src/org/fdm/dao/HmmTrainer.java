@@ -16,7 +16,6 @@ import org.fdm.domain.Intro_learn;
 import org.fdm.domain.Intro_seg;
 import org.fdm.model.HmmModel;
 import org.fdm.util.StrHandler;
-import org.fdm.util.TagHandler;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -159,7 +158,7 @@ public class HmmTrainer {
 			list_text.clear();
 			list_cls.clear();
 			try{
-				StrHandler.intro_string2array(introduction, list_text,  list_cls);
+				StrHandler.introString2array(introduction, list_text,  list_cls);
 			}catch(Exception e){
 				System.out.println(introduction);
 			}
@@ -194,54 +193,6 @@ public class HmmTrainer {
             }
         }
 		
-		session.flush();
-		session.clear();
-		session.getTransaction().commit();
-		session.close();
-	}
-	
-	/**
-	 * seg intro_learn with dictionary tokens and introduction tokens
-	 * @param pidFrom
-	 * @param pidTo
-	 */
-	public void add_tag(int pidFrom, int pidTo){
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		Query q1 = session.createQuery("from Intro_learn where pid>="+pidFrom+" and pid<"+pidTo+" order by pid");
-		Query q3 = session.createQuery("from AllDictTokens order by char_length(sText) DESC");
-		Query q4 = session.createQuery("from Intro_seg where id>="+pidFrom+" and id<"+pidTo+"order by id");
-		@SuppressWarnings("unchecked")
-		List<Intro_learn> list_intro = q1.list();
-		@SuppressWarnings("unchecked")
-		List<AllDictTokens> dicTokens = q3.list();
-		@SuppressWarnings("unchecked")
-		List<Intro_seg> list_seg = q4.list();
-		String introduction;
-		String segIntro;
-		Intro_learn intro;
-		Intro_seg intro_seg;
-		
-		for(int i=0;i<list_intro.size();i++){
-			intro = list_intro.get(i);
-			intro_seg = list_seg.get(i);
-			introduction = intro.getIntroduction();
-			segIntro = intro_seg.getIntroduction();
-			//add the dictionary tag
-			introduction = TagHandler.add_dictionary_tag(introduction, dicTokens);
-			//add the normal tag 
-			introduction = TagHandler.add_normal_tag(introduction, segIntro);
-			
-			Query q2 = session.createQuery("update Intro_learn set introduction = ? where pid = ?");			
-			q2.setParameter(0, introduction);
-			q2.setParameter(1, intro.getPid());
-			q2.executeUpdate();
-			if(i%200==0){
-				System.out.println("percent: "+ (double) i/list_intro.size()+" at "+i);
-				session.flush();
-				session.clear();
-			}
-		}
 		session.flush();
 		session.clear();
 		session.getTransaction().commit();

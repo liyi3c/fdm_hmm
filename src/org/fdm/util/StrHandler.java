@@ -149,24 +149,31 @@ public class StrHandler {
 		return -1;
 	}
 	
-	public static String intro_array2string(ArrayList<String> text,  ArrayList<Integer> cls){
+	public static String introArray2string(ArrayList<String> textList,  ArrayList<Integer> clsList){
 		String intro_replace = new String();
-		for(int i=0;i<text.size();i++){
-			intro_replace = intro_replace+text.get(i)+"\t"+cls.get(i)+"\t"+i+"\t";
+		for(int i=0;i<textList.size();i++){
+			intro_replace = intro_replace+textList.get(i)+"\t"+clsList.get(i)+"\t"+i+"\t";
 		}
 		
 		return intro_replace;
 	}
 	
-	public static void intro_string2array(String introduction, ArrayList<String> text,  ArrayList<Integer> cls){
+	public static void introString2array(String introduction, ArrayList<String> textList,  ArrayList<Integer> tagList){
 		Pattern pattern = Pattern.compile("(?<tok>[^\\s]+)[\\s+]+(?<type>\\d+)[\\s+]+(?<index>\\d+)[\\s+]+");
 		Matcher matcher;
 		matcher = pattern.matcher(introduction);
 		while(matcher.find()) {
-			text.add(matcher.group("tok"));
-			cls.add(Integer.parseInt(matcher.group("type")));
+			textList.add(matcher.group("tok"));
+			tagList.add(Integer.parseInt(matcher.group("type")));
 		}
 	}
+	
+//	public static ArrayList<String> split(String in, String delimiter) {
+//		ArrayList<String> splitList = new ArrayList<String>();
+//		in.
+//		
+//		return splitList;
+//	}
 	
 //	public static void main(String args[]){
 //		int D = getDis("仇卫平","任华");

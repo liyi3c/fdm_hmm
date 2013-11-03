@@ -6,7 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="intro_learn_v2")
+@Table(name="intro_sae_stf_seg_train")
 public class Intro_learn {
 	String introduction;
 	int pid;

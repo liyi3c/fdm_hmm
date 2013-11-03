@@ -1,9 +1,9 @@
-�ж����������Ƿ����������Ҫ���Ƶ��ֶζ࣬����Ҫ���Ƶ��ֶ���������Ŀ�г��ֵ���
-select introduction from people where introduction like '%�Ż��ʦ������%' �ܶ�û����������
-�Ѹ��ʿ����ظ���ɾ��
-2011 ��6 ��28 �����ٵ��α�����ҵ���³�
-�滻��˾ǰ�ѿո�ȥ��
-�ѣ��滻Ϊ(
-select * from allpos where position like '%ע��%'
-���½��� '��ȥ'
-ȥ������С��3�����Ϊ���ܵ��´���
+判断两个部门是否关联，不仅要相似的字段多，而且要相似的字段在其他条目中出现的少
+select introduction from people where introduction like '%信会计师事务所%' 很多没检测出事务所
+把各词库中重复的删除
+2011 年6 月28 日起不再担任北方创业董事长
+替换公司前把空格去掉
+把（替换为(
+select * from allpos where position like '%注册%'
+重新建立 '辞去'
+去掉长度小于3的项，因为可能导致错误

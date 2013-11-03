@@ -6,11 +6,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="Intro_sae_stf_seg")
-public class Intro_seg {
+@Table(name="Intro_raw")
+public class Intro_raw {
 	int pid;
 	String introduction;
-	
 	@Id
 	@GeneratedValue
 	public int getPid() {

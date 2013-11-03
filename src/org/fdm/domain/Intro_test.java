@@ -6,10 +6,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="intro_raw_test_twice_tokens")
+@Table(name="intro_sae_stf_seg_test")
 public class Intro_test {
 	String introduction;
-	int id;
+	int pid;
 	public String getIntroduction(){
 		return introduction;
 	}
@@ -20,10 +20,10 @@ public class Intro_test {
 	
 	@Id
 	@GeneratedValue
-	public int getId(){
-		return id;
+	public int getPid(){
+		return pid;
 	}
-	public void setId(int id){
-		this.id=id;
+	public void setPid(int pid){
+		this.pid=pid;
 	}
 }

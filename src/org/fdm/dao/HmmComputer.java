@@ -6,10 +6,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import javax.annotation.Resource;
 
+import org.fdm.domain.Auditor;
 import org.fdm.domain.Intro_test;
 import org.fdm.model.HmmModel;
 import org.fdm.util.MathUtiler;
@@ -19,6 +22,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Component;
 
+import edu.stanford.nlp.ie.crf.CRFClassifier;
+import edu.stanford.nlp.ling.CoreLabel;
 import exp.check.io.IoExpHandler;
 
 @Component
@@ -97,9 +102,9 @@ public class HmmComputer {
 				inputIntro = list_intro.get(kk).getIntroduction();
 				text_in = new ArrayList<String>();
 				cls_in = new ArrayList<Integer>();
-				StrHandler.intro_string2array(inputIntro, text_in, cls_in);
+				StrHandler.introString2array(inputIntro, text_in, cls_in);
 				
-				hmmCompute(text_in, cls_in);
+				hmmCompute(text_in);
 				for(int i=0;i<cls_in.size();i++){
 					textOutWriter.write("***"+cls_output[i]+"***"+cls_in.get(i)+"***"+text_in.get(i)+"***\r\n");
 				}
@@ -109,29 +114,103 @@ public class HmmComputer {
 			} finally {
 				IoExpHandler.closeWriter(textOutWriter);
 			}
+			
+			session.flush();
+			session.clear();
+			session.getTransaction().commit();
+			session.close();
 		}
 	}
 	
-	private void hmmCompute(ArrayList<String> text_in, ArrayList<Integer> cls_in) {
+	public void computeFromRawToDB(){
+		Properties props = new Properties();
+	    props.setProperty("sighanCorporaDict", "data");
+	    props.setProperty("serDictionary","data/dict-chris6.ser.gz");
+	    props.setProperty("inputEncoding", "UTF-8");
+	    props.setProperty("sighanPostProcessing", "true");
+	    CRFClassifier<CoreLabel> segmenter = new CRFClassifier<CoreLabel>(props);
+	    segmenter.loadClassifierNoExceptions("data/ctb.gz", props);
+	    
+		FileInputStream fis = null;
+		ObjectInputStream ois = null;
+		try {
+			fis = new FileInputStream(hmmModelFile);
+            ois = new ObjectInputStream(fis);
+            hmm = (HmmModel) ois.readObject();
+		} catch (IOException ioe) {
+			throw new RuntimeException("Err to load Model from file. Details : \r\n" + ioe.getMessage());
+		} catch (ClassNotFoundException anfe) {
+			throw new RuntimeException("Err to read Model, please check it's valid model. Details : \r\n" + anfe.getMessage());
+		} finally {
+			IoExpHandler.closeInputStream(ois);
+			IoExpHandler.closeInputStream(fis);
+		}
+		
+		init();
+
+		String inputIntro;
+		String intro_stf_seg;
+		
+		if (testFile == null) {
+			Session session = sessionFactory.openSession();
+			session.beginTransaction();
+			Query q1 = session.createQuery("from Auditor");
+			@SuppressWarnings("unchecked")
+			List<Auditor> list_intro = q1.list();	
+			for(int kk=0;kk<list_intro.size();kk++){
+				StringBuilder strBld = new StringBuilder("");
+				inputIntro = list_intro.get(kk).getBackground();
+				if(inputIntro.length() <= 3)
+					continue;
+				intro_stf_seg = segmenter.classifyToString(inputIntro);
+				if(intro_stf_seg.length() <= 3)
+					continue;
+				text_in = new ArrayList<String>(Arrays.asList(intro_stf_seg.split(" ")));
+				
+				hmmCompute(text_in);
+				for(int i=0;i<cls_output.length;i++){
+	    			strBld.append(text_in.get(i)).append("\t").append(cls_output[i]).append("\t");
+				}
+				
+				Query q2 = session.createQuery("update Auditor set backgroundSeg = ? where id = ?");
+				q2.setParameter(0, strBld.toString());
+				q2.setParameter(1, list_intro.get(kk).getId());
+				q2.executeUpdate();
+				
+				if (kk%1000 == 0) {
+					System.out.println("Percent: " + (double)kk/list_intro.size());
+					session.flush();
+					session.clear();
+				}
+			}
+			
+			session.flush();
+			session.clear();
+			session.getTransaction().commit();
+			session.close();
+		}
+	}
+	
+	private void hmmCompute(ArrayList<String> text_in) {
 		int dimension_cls = clsMap_cls.size();
-		int N = cls_in.size();
+		int N = text_in.size();
 		cls_input = new int[N][dimension_cls];
 		cls_output = new int[N];
 		Double[] temp_prob = new Double[dimension_cls];
 		Double[] temp_prob2 = new Double[dimension_cls];
 		Double[] temp_prob3 = new Double[dimension_cls];
 		for(int i=0;i<dimension_cls;i++){
-			temp_prob[i]=0.0;
+			temp_prob[i]=1/(double)dimension_cls;
 			temp_prob2[i]=0.0;
 			temp_prob3[i]=0.0;
-			cls_input[0][i]=clsMap_cls.indexOf(cls_in.get(0));
+			cls_input[0][i]=i;
 		}
-		if (clsMap_cls.indexOf(cls_in.get(0)) != -1)
-			temp_prob[clsMap_cls.indexOf(cls_in.get(0))]=1.0;
-		else
-			System.out.println("------ cls_in.get(0) =  " + cls_in.get(0) + 
-					"\n -------clsMap_cls.indexOf(cls_in.get(0)) = " + 
-					clsMap_cls.indexOf(cls_in.get(0)));
+//		if (clsMap_cls.indexOf(cls_in.get(0)) != -1)
+//		temp_prob[clsMap_cls.indexOf(cls_in.get(0))]=1.0;
+//		else
+//			System.out.println("------ cls_in.get(0) =  " + cls_in.get(0) + 
+//					"\n -------clsMap_cls.indexOf(cls_in.get(0)) = " + 
+//					clsMap_cls.indexOf(cls_in.get(0)));
 		int index;
 		int max_arg;
 		int i=0;

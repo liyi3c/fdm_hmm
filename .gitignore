@@ -216,5 +216,10 @@ pip-log.txt
 
 #User Defined
 deploy/
+dic/
+data/
+*.s
+*.tok
 *.ser
 *.out
+*.rar

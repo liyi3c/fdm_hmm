@@ -43,6 +43,7 @@
 			<value>org.fdm.domain.ExperD</value>
 			<value>org.fdm.domain.Exper</value>
 			<value>org.fdm.domain.PersonInfor</value>
+			<value>org.fdm.domain.Intro_raw</value>
 			<value>org.fdm.domain.Intro_learn</value>
 			<value>org.fdm.domain.All_pos</value>
 			<value>org.fdm.domain.All_com</value>
@@ -51,6 +52,9 @@
 			<value>org.fdm.domain.Intro_test</value>
 			<value>org.fdm.domain.RelationComHama</value>
 			<value>org.fdm.domain.TrainData</value>
+			<value>org.fdm.domain.PotentialWrong</value>
+			<value>org.fdm.domain.All_dict</value>
+			<value>org.fdm.domain.Auditor</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
